@@ -129,7 +129,7 @@ function llrBin(d, nBins, bin) {
    bin 0 = male-typical answer, last bin = female-typical. d values come from the studies in SOURCES. */
 const SPONSORS = {
   things: [["🔧", "Max's Car Garage"], ["⚡", "Volt Electrical"], ["🏗️", "Brick & Beam Builders"], ["💻", "ByteForge Software"],
-    ["✈️", "SkyLine Flight School"], ["🪚", "Oak Carpentry"], ["🚜", "Big Wheel Tractors"], ["🛰️", "Orbit Space Labs"],
+    ["✈️", "SkyLine Flight School"], ["🔨", "Oak Carpentry"], ["🚜", "Big Wheel Tractors"], ["🛰️", "Orbit Space Labs"],
     ["🎮", "Pixel Game Studio"], ["🔩", "Bolt Hardware"]],
   people: [["🤝", "Helping Hands Care Home"], ["🩺", "City Clinic"], ["🛋️", "Cosy Interior Design"], ["🍎", "Little Steps Preschool"],
     ["👗", "Atelier Fashion"], ["💐", "Bloom Florist"], ["💒", "Forever Wedding Planners"], ["💇", "Glow Hair Salon"],
@@ -147,11 +147,11 @@ const HOB = [
   [.65, "The team mascot's birthday. Your gift:", ["🔩", "A Lego Technic set"], ["🧶", "A knitting kit"]],
 ];
 const PER = [
-  [.4, "Your teammate misses an easy ball and looks upset.", ["🛠️", "Tell them how to fix it"], ["🤷", "Say nothing, next point"], ["🫂", "Cheer them up"]],
+  [.4, "Your teammate misses an easy ball and looks upset.", ["🛠️", "Tell them how to fix it"], ["🤷", "Say nothing, next point"], ["🤗", "Cheer them up"]],
   [.4, "The final is tomorrow. How do you sleep?", ["😴", "Like a baby"], ["😕", "A bit restless"], ["😟", "Barely, too nervous"]],
-  [.4, "Bonus event: cliff diving into the sea.", ["🪂", "I jump first"], ["🤔", "Maybe, after the others"], ["🏖️", "I watch from the beach"]],
-  [.5, "A huge spider is sitting on the net.", ["🫙", "Catch it and move it"], ["📣", "Call the referee"], ["🏃", "Leave the court"]],
-  [.5, "The losing captain is crying on court.", ["😐", "Doesn't really get to me"], ["🥲", "I feel a bit sad"], ["😭", "I almost cry too"]],
+  [.4, "Bonus event: cliff diving into the sea.", ["🌊", "I jump first"], ["🤔", "Maybe, after the others"], ["🏖️", "I watch from the beach"]],
+  [.5, "A huge spider is sitting on the net.", ["✋", "Catch it and move it"], ["📣", "Call the referee"], ["🏃", "Leave the court"]],
+  [.5, "The losing captain is crying on court.", ["😐", "Doesn't really get to me"], ["😢", "I feel a bit sad"], ["😭", "I almost cry too"]],
   [.4, "Can you tell a teammate is upset before they say anything?", ["🤨", "Rarely"], ["👀", "Sometimes"], ["💡", "Usually"]],
   [.45, "The scoreboard breaks down.", ["🔍", "I want to open it up and see why"], ["🙂", "A little curious"], ["😴", "Not my problem"]],
   [.25, "The referee makes a bad call.", ["🗣️", "I argue it"], ["⚖️", "Depends how bad"], ["🕊️", "I let it go"]],
@@ -375,7 +375,7 @@ function drawPlate(canvas, num) {
   canvas.width = S; canvas.height = S;
   const m = document.createElement("canvas"); m.width = S; m.height = S;
   const mc = m.getContext("2d");
-  mc.fillStyle = "#000"; mc.font = `bold ${String(num).length > 1 ? 230 : 280}px Arial, Helvetica, sans-serif`;
+  mc.fillStyle = "#000"; mc.font = `900 ${String(num).length > 1 ? 250 : 300}px "Arial Black", Arial, Helvetica, sans-serif`;
   mc.textAlign = "center"; mc.textBaseline = "middle"; mc.fillText(String(num), S / 2, S / 2 + 12);
   const mask = mc.getImageData(0, 0, S, S).data;
   ctx.fillStyle = "#e9e4d6"; ctx.fillRect(0, 0, S, S);
@@ -389,7 +389,7 @@ function drawPlate(canvas, num) {
   for (const d of dots) {
     const inFig = mask[((d.y | 0) * S + (d.x | 0)) * 4 + 3] > 128;
     // Figure: orange-reds; background: olive/yellow-greens. Both lie near a red-green confusion line; lightness is jittered so brightness gives no clue.
-    ctx.fillStyle = inFig ? `hsl(${rnd(8, 32)} ${rnd(55, 72)}% ${rnd(48, 64)}%)` : `hsl(${rnd(68, 100)} ${rnd(42, 60)}% ${rnd(46, 64)}%)`;
+    ctx.fillStyle = inFig ? `hsl(${rnd(6, 26)} ${rnd(65, 80)}% ${rnd(50, 62)}%)` : `hsl(${rnd(72, 102)} ${rnd(40, 55)}% ${rnd(48, 62)}%)`;
     ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
   }
 }
@@ -488,12 +488,14 @@ const SOURCES = [
 ];
 
 function drawJersey(canvas, colour) {
-  const ctx = canvas.getContext("2d"); canvas.width = 16; canvas.height = 14;
-  JERSEY.forEach((row, y) => [...row].forEach((ch, x) => {
-    if (ch === ".") return;
-    ctx.fillStyle = ch === "W" ? "#ffffff" : colour; ctx.fillRect(x, y, 1, 1);
-    if (ch === "S") { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(x, y, 1, 1); }
-  }));
+  const ctx = canvas.getContext("2d"); canvas.width = 18; canvas.height = 16;
+  const cells = JERSEY.flatMap((row, y) => [...row].map((ch, x) => ({ ch, x: x + 1, y: y + 1 }))).filter(c => c.ch !== ".");
+  ctx.fillStyle = "#000";   // 1-pixel black outline so the jersey stands out on its own colour
+  for (const c of cells) for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) ctx.fillRect(c.x + dx, c.y + dy, 1, 1);
+  for (const c of cells) {
+    ctx.fillStyle = c.ch === "W" ? "#ffffff" : colour; ctx.fillRect(c.x, c.y, 1, 1);
+    if (c.ch === "S") { ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(c.x, c.y, 1, 1); }
+  }
 }
 
 function showResult() {
@@ -507,7 +509,7 @@ function showResult() {
   app.innerHTML = `
     <div class="top"><span class="tag">DRAFT DAY</span><span class="count">FINAL</span></div>
     <div class="result-band" style="${bg}">
-      <canvas id="jersey" style="width:128px;height:auto;image-rendering:pixelated" aria-hidden="true"></canvas>
+      <canvas id="jersey" style="width:144px;height:auto;image-rendering:pixelated" aria-hidden="true"></canvas>
       <span class="say">You've been drafted to</span>
       <span class="team" style="color:#fff">TEAM ${team}</span>
       <span class="say">${enough ? "Tell the organiser your team colour." : "Too many moments timed out. Play again."}</span>
