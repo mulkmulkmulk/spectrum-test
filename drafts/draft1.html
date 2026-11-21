@@ -1,0 +1,61 @@
+<title>Spectrum Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap">
+<style>
+:root{--bg:#f3f5f7;--surface:#fff;--ink:#16202a;--muted:#5d6a75;--line:#d8dfe4;--accent:#3d4a9e;
+--font-display:"Sora","Segoe UI",system-ui,sans-serif;--font-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--font-mono:"IBM Plex Mono",Consolas,monospace}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--font-body)}
+.wrap{max-width:640px;margin:0 auto;padding:32px 16px}
+h1{font:700 30px var(--font-display);margin:0 0 8px}
+.opt{display:block;width:100%;margin:8px 0;padding:14px;font:inherit;background:var(--surface);border:2px solid var(--line);border-radius:10px;cursor:pointer;text-align:left}
+.opt:hover{border-color:var(--accent)}
+.emoji{font-size:28px;margin-right:10px}
+.timer{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:12px 0}
+.timer i{display:block;height:100%;background:var(--accent)}
+.swatch{display:inline-block;width:80px;height:80px;border-radius:10px;margin:6px;cursor:pointer;border:2px solid var(--line)}
+.result{width:100%;height:200px;border-radius:16px}
+button.start{padding:12px 24px;font:600 16px var(--font-body);background:var(--accent);color:#fff;border:0;border-radius:8px;cursor:pointer}
+</style>
+<div class="wrap" id="app"></div>
+<script>
+const Phi=x=>{const t=1/(1+.2316419*Math.abs(x)),d=.3989423*Math.exp(-x*x/2),p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p};
+// x: +1 = male-typical option, -1 = female-typical. d = approx Cohen's d.
+const POOL=[
+ {q:"Which job would you rather have?",d:.9,o:[["🔧","Car mechanic",1],["🤝","Social worker",-1]]},
+ {q:"Which job would you rather have?",d:.9,o:[["⚡","Electrical engineer",1],["🩺","Nurse",-1]]},
+ {q:"Which job would you rather have?",d:.8,o:[["🏗️","Building contractor",1],["🛋️","Interior decorator",-1]]},
+ {q:"Which job would you rather have?",d:.7,o:[["💻","Programmer",1],["🍎","Primary school teacher",-1]]},
+ {q:"Which job would you rather have?",d:.8,o:[["✈️","Pilot",1],["👗","Fashion designer",-1]]},
+ {q:"Which video would you click?",d:.8,o:[["⚙️","How an engine works",1],["💄","Makeup tutorial",-1]]},
+ {q:"A free afternoon. You'd rather…",d:.6,o:[["🪛","Build or fix something",1],["☕","Have a long talk with a friend",-1]]},
+ {q:"Which gift would you rather get?",d:.7,o:[["🎧","A new gadget",1],["💍","Jewelry",-1]]},
+ {q:"Sad scene in a movie. You…",d:.5,o:[["😐","Rarely cry",1],["😢","Often tear up",-1]]},
+ {q:"How often do you worry about things going wrong?",d:.4,o:[["🙂","Rarely",1],["😟","Often",-1]]},
+ {q:"A friend is upset. Your first move?",d:.4,o:[["🛠️","Help fix the problem",1],["🫂","Comfort them",-1]]},
+ {q:"Bungee jump, for free?",d:.4,o:[["🪂","Yes",1],["🙅","No",-1]]},
+ {q:"In a long-term partner, which matters more?",d:.7,o:[["✨","Good looks",1],["💼","Good earning potential",-1]]},
+ {q:"Ideal partner's age?",d:1,o:[["⬇️","Younger than me",1],["⬆️","Older than me",-1]]},
+];
+const COLORS=[["#2b6fd6",.2],["#1f9e6e",.25],["#d6322b",-.15],["#f28cc0",-.5],["#8e44ad",-.4],["#f2c230",0]];
+let items=[],i=0,L=0,timer;
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.random()*(k+1)|0;[a[k],a[j]]=[a[j],a[k]]}return a}
+function start(){items=shuffle(POOL.slice()).slice(0,12);items.push({color:1});i=0;L=0;next()}
+function llr(d,x){const pm=Phi(x*d/2),pf=Phi(-x*d/2);return Math.log(pm/pf)}
+function answer(v){clearInterval(timer);L+=v;i++;next()}
+function next(){
+ const app=document.getElementById("app");
+ if(i>=items.length)return result();
+ const it=items[i];
+ let h=`<p>${i+1}/${items.length}</p><div class="timer"><i id="bar" style="width:100%"></i></div>`;
+ if(it.color){h+=`<h2>Pick your favourite colour</h2>`+COLORS.map((c,k)=>`<span class="swatch" style="background:${c[0]}" onclick="answer(${c[1]})"></span>`).join("")}
+ else{h+=`<h2>${it.q}</h2>`+it.o.map(o=>`<button class="opt" onclick="answer(${llr(it.d,o[2])})"><span class="emoji">${o[0]}</span>${o[1]}</button>`).join("")}
+ app.innerHTML=h;
+ let t=8;timer=setInterval(()=>{t-=.1;document.getElementById("bar").style.width=t/8*100+"%";if(t<=0)answer(0)},100);
+}
+function result(){
+ const p=1/(1+Math.exp(-L));
+ const r=Math.round(255*(1-p)),b=Math.round(255*p);
+ document.getElementById("app").innerHTML=`<h1>Your colour</h1><div class="result" style="background:rgb(${r},0,${b})"></div><p>${Math.round(p*100)}% male</p><button class="start" onclick="start()">Again</button>`;
+}
+document.getElementById("app").innerHTML=`<h1>Spectrum Test</h1><p>Answer quickly. Each question has 8 seconds.</p><button class="start" onclick="start()">Start</button>`;
+</script>

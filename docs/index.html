@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Spectrum Test</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@600;700;800&display=swap">
+<style>
+/* Layout: one centred test card that swaps screens; result is a full-width colour field with the colour's name */
+:root {
+  --bg: #eef0f4;
+  --surface: #ffffff;
+  --ink: #171b24;
+  --muted: #5e6575;
+  --line: #d6dae3;
+  --btn: #1d2230;
+  --btn-ink: #ffffff;
+  --cube: 214;
+  --font-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --surface: #1b2029; --ink: #e8ebf2; --muted: #9aa2b3;
+    --line: #2d3442; --btn: #e8ebf2; --btn-ink: #12151c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --surface: #1b2029; --ink: #e8ebf2; --muted: #9aa2b3;
+  --line: #2d3442; --btn: #e8ebf2; --btn-ink: #12151c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--font-body); }
+.wrap {
+  max-width: 640px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: clamp(18px, 4vw, 28px); display: grid; gap: 16px; }
+h1, h2 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(28px, 6vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: clamp(19px, 4.4vw, 23px); font-weight: 700; line-height: 1.3; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.eyebrow { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.spectrum { height: 14px; border-radius: 7px; background: linear-gradient(90deg, oklch(.6 .2 25), oklch(.6 .2 322), oklch(.6 .2 260)); }
+.btn { font: 600 16px var(--font-body); background: var(--btn); color: var(--btn-ink); border: 0; border-radius: 10px; padding: 13px 22px; cursor: pointer; justify-self: start; }
+.btn:focus-visible, .opt:focus-visible, .sw:focus-visible { outline: 3px solid var(--muted); outline-offset: 2px; }
+.rules { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.count { font: 600 13px var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.timer { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.timer i { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left; }
+.timer.low i { background: oklch(.62 .2 30); }
+.opts { display: grid; gap: 10px; }
+.opts.two { grid-template-columns: 1fr 1fr; }
+.opt {
+  font: 500 15px var(--font-body); color: var(--ink); background: var(--bg);
+  border: 2px solid var(--line); border-radius: 12px; padding: 14px 12px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; min-width: 0;
+}
+.opts.three .opt { flex-direction: row; justify-content: flex-start; text-align: left; }
+.opt:hover { border-color: var(--ink); }
+.pic { font-size: 40px; line-height: 1; }
+.opts.three .pic { font-size: 26px; }
+.key { font: 600 11px var(--font-mono); color: var(--muted); }
+.opts.three .key { margin-left: auto; }
+.sws { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.sws.pair { grid-template-columns: 1fr 1fr; }
+.sw { aspect-ratio: 1.4; max-width: 100%; border-radius: 12px; border: 2px solid var(--line); cursor: pointer; }
+.shapes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.target { display: grid; place-items: center; background: var(--bg); border-radius: 12px; }
+.shape { background: var(--bg); border: 2px solid var(--line); border-radius: 12px; cursor: pointer; padding: 0; display: grid; place-items: center; }
+.shape:hover { border-color: var(--ink); }
+svg { display: block; max-width: 100%; height: auto; }
+.flash { font: 600 13px var(--font-mono); color: var(--muted); min-height: 1.5em; }
+
+.result { border-radius: 14px; min-height: 230px; display: grid; place-content: center; text-align: center; gap: 6px; padding: 24px; color: #fff; }
+.result .name { font: 800 clamp(44px, 13vw, 76px)/1 var(--font-display); letter-spacing: .02em; }
+.result .say { font: 600 14px var(--font-mono); opacity: .9; }
+details { border-top: 1px solid var(--line); padding-top: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+.giver { display: grid; gap: 12px; margin-top: 12px; }
+.marker { position: relative; height: 14px; }
+.marker b { position: absolute; top: -4px; width: 4px; height: 22px; background: var(--ink); border-radius: 2px; transform: translateX(-2px); }
+.ends { display: flex; justify-content: space-between; font: 600 12px var(--font-mono); color: var(--muted); }
+.rows { display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: 110px 1fr 54px; gap: 10px; align-items: center; font-size: 13px; }
+.bar2 { height: 8px; background: var(--line); border-radius: 4px; position: relative; }
+.bar2 i { position: absolute; top: 0; height: 100%; border-radius: 4px; }
+.row span:last-child { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.src { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; }
+.src a { color: var(--ink); }
+button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (hover: none) {
+  .key, .kbd-tip { display: none; }
+  .opt:hover, .shape:hover { border-color: var(--line); }
+  .opt:active, .shape:active, .sw:active { border-color: var(--ink); transform: scale(.98); }
+}
+@media (max-width: 420px) { .opts.two { grid-template-columns: 1fr; } .opts.two .opt { flex-direction: row; text-align: left; } .row { grid-template-columns: 84px 1fr 46px; } }
+</style>
+
+<div class="wrap"><main class="card" id="app" aria-live="polite"></main></div>
+
+<script>
+"use strict";
+/* ---------- Maths ---------- */
+const Phi = x => { const t = 1 / (1 + .2316419 * Math.abs(x)), d = .3989423 * Math.exp(-x * x / 2),
+  p = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return x > 0 ? 1 - p : p; };
+const rnd = (a, b) => a + Math.random() * (b - a);
+const shuffle = a => { for (let k = a.length - 1; k > 0; k--) { const j = Math.random() * (k + 1) | 0; [a[k], a[j]] = [a[j], a[k]]; } return a; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// Log-likelihood ratio (male vs female) for answer bin `bin` of an item with effect size d.
+// Model: underlying trait ~ N(+d/2, 1) for men and N(-d/2, 1) for women, cut into 2 or 3 bins.
+function llrBin(d, nBins, bin) {
+  const cuts = nBins === 2 ? [0] : [-.43, .43], e = [-Infinity, ...cuts, Infinity];
+  const pr = mu => Phi(e[bin + 1] - mu) - Phi(e[bin] - mu);
+  return Math.log(pr(d / 2) / pr(-d / 2));
+}
+
+/* ---------- Item bank ----------
+   Options are listed from most male-typical to most female-typical; they're shuffled when shown
+   (three-option scales keep their order, since the middle answer has to stay in the middle).
+   d = approximate standardised sex difference for that kind of item, from the studies in SOURCES. */
+const BANK = {
+  job: { label: "Job interests", n: 3, r: .5, q: "Which job would you rather have?", items: [
+    [.9, ["🔧", "Car mechanic"], ["🤝", "Social worker"]],
+    [.9, ["⚡", "Electrical engineer"], ["🩺", "Nurse"]],
+    [.85, ["🏗️", "Building contractor"], ["🛋️", "Interior decorator"]],
+    [.7, ["💻", "Software developer"], ["🍎", "Primary school teacher"]],
+    [.85, ["✈️", "Airline pilot"], ["👗", "Fashion designer"]],
+    [.5, ["🔭", "Physicist"], ["🧠", "Psychologist"]],
+    [.8, ["🚒", "Firefighter"], ["💐", "Florist"]],
+    [.85, ["🎮", "Game programmer"], ["💒", "Wedding planner"]],
+    [.9, ["🪚", "Carpenter"], ["💇", "Hairdresser"]],
+    [.6, ["🛰️", "Satellite engineer"], ["📚", "Librarian"]],
+    [.7, ["🚜", "Farm machinery operator"], ["🧸", "Daycare worker"]],
+    [.6, ["📈", "Stock trader"], ["🎨", "Art therapist"]],
+  ]},
+  hob: { label: "Hobbies & taste", n: 2, r: .45, items: [
+    [.9, "Which video would you click?", ["⚙️", "How an engine works"], ["💄", "A makeup tutorial"]],
+    [.6, "A free afternoon. You'd rather…", ["🪛", "Build or fix something"], ["☕", "Have a long talk with a friend"]],
+    [.7, "Which gift would you rather get?", ["🎧", "A new gadget"], ["💍", "A piece of jewelry"]],
+    [.5, "What would you rather watch tonight?", ["⚽", "A football match"], ["🎭", "A drama series"]],
+    [.6, "Which game would you rather play?", ["🎯", "A strategy or shooter game"], ["🧩", "A puzzle or life-sim game"]],
+    [.6, "Which museum would you rather visit?", ["🛩️", "Aviation museum"], ["🖼️", "Fashion exhibition"]],
+    [.7, "Which magazine would you pick up?", ["🏎️", "Cars"], ["🌿", "Home and garden"]],
+    [.3, "Lost in a new city. You'd rather…", ["🗺️", "Work it out from a map"], ["🙋", "Ask someone for directions"]],
+    [.7, "Which kit would you rather get?", ["🔩", "A Lego Technic set"], ["🧶", "A knitting kit"]],
+    [.6, "Which documentary would you watch?", ["⚔️", "War history"], ["👑", "The royal family"]],
+  ]},
+  per: { label: "Personality", n: 3, r: .25, items: [
+    [.6, "A sad scene in a movie. You…", ["😐", "Rarely cry"], ["🥲", "Sometimes tear up"], ["😭", "Often cry"]],
+    [.4, "How often do you worry that things will go wrong?", ["🙂", "Rarely"], ["😕", "Sometimes"], ["😟", "Often"]],
+    [.4, "A friend is upset. Your first move?", ["🛠️", "Help fix the problem"], ["🤷", "Depends"], ["🫂", "Comfort them"]],
+    [.4, "Free bungee jump. Do you go?", ["🪂", "Yes"], ["🤔", "Maybe"], ["🙅", "No"]],
+    [.5, "There's a big spider on the wall.", ["🫙", "I remove it"], ["📣", "I ask someone else"], ["🏃", "I leave the room"]],
+    [.4, "Do you notice a friend is upset before they say anything?", ["🤨", "Rarely"], ["👀", "Sometimes"], ["💡", "Usually"]],
+    [.45, "Do you like knowing exactly how machines work?", ["🔍", "Very much"], ["🙂", "Somewhat"], ["😴", "Not really"]],
+    [.25, "In a disagreement you usually…", ["🗣️", "Say it straight"], ["⚖️", "It depends"], ["🕊️", "Avoid the conflict"]],
+    [.35, "How often does your mood swing during a day?", ["🪨", "Rarely"], ["🌤️", "Sometimes"], ["🎢", "Often"]],
+    [.35, "How interested are you in horoscopes?", ["🚫", "Not at all"], ["🌙", "A little"], ["✨", "Quite a lot"]],
+  ]},
+  mate: { label: "Partner preferences", n: 2, r: .3, items: [
+    [.75, "In a long-term partner, which matters more?", ["✨", "Good looks"], ["🤝", "Both equally"], ["💼", "Good earning potential"]],
+    [1.0, "Your ideal partner's age is…", ["⬇️", "Younger than me"], ["↔️", "About my age"], ["⬆️", "Older than me"]],
+    [.8, "Would you date someone shorter than you?", ["👍", "Yes"], ["🤔", "Maybe"], ["👎", "No"]],
+    [.5, "How much does a partner's ambition and status matter?", ["🤷", "Not much"], ["🙂", "Somewhat"], ["🏆", "A lot"]],
+  ]},
+};
+// Favourite-colour choice: direct log-likelihood ratios (small; colour preference differences are weak).
+const FAV = [["Blue", 255, .15], ["Green", 150, .25], ["Red", 25, -.2], ["Pink", 350, -.6], ["Purple", 310, -.45], ["Yellow", 95, 0]];
+// Rotation task: chance of a correct answer within the time limit (men / women), timed-test male advantage.
+const ROT = { n: 4, r: .3, pm: .82, pf: .72, secs: 10 };
+const SECS = 7;            // time limit for preference questions
+const TEMP = 1.15;         // calibration factor, fitted in simulation
+const DOMAIN_LABEL = { job: "Job interests", hob: "Hobbies & taste", per: "Personality", mate: "Partner preferences", col: "Colour taste", rot: "3D rotation" };
+const DOMAIN_R = { job: .5, hob: .45, per: .25, mate: .3, col: .2, rot: ROT.r };
+
+/* ---------- 3D shapes for the rotation task ---------- */
+const ROTMATS = (() => {
+  const out = [], perms = [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];
+  for (const p of perms) for (let s = 0; s < 8; s++) {
+    const sg = [s & 1 ? -1 : 1, s & 2 ? -1 : 1, s & 4 ? -1 : 1];
+    const M = [0,1,2].map(r => [0,1,2].map(c => c === p[r] ? sg[r] : 0));
+    const det = M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1]) - M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0]) + M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]);
+    if (det === 1) out.push(M);
+  }
+  return out;
+})();
+const canon = cs => { const m = [0,1,2].map(a => Math.min(...cs.map(c => c[a]))); return cs.map(c => c.map((v, a) => v - m[a]).join(",")).sort().join(";"); };
+function makeShape() {
+  for (;;) {
+    const cubes = [[0,0,0]], seen = new Set(["0,0,0"]), pos = [0,0,0], axes = new Set();
+    let prev = -1, ok = true;
+    for (const len of shuffle([3, 2, 2, 3])) {
+      let ax; do { ax = Math.random() * 3 | 0; } while (ax === prev);
+      prev = ax; axes.add(ax);
+      const s = Math.random() < .5 ? 1 : -1;
+      for (let k = 0; k < len; k++) {
+        pos[ax] += s; const key = pos.join(",");
+        if (seen.has(key)) { ok = false; break; }
+        seen.add(key); cubes.push(pos.slice());
+      }
+      if (!ok) break;
+    }
+    if (!ok || axes.size < 3) continue;
+    const mirror = cubes.map(([x, y, z]) => [-x, y, z]), base = canon(cubes);
+    if (ROTMATS.some(M => canon(mirror.map(c => [0,1,2].map(r => M[r][0]*c[0] + M[r][1]*c[1] + M[r][2]*c[2]))) === base)) continue;
+    return cubes;
+  }
+}
+function drawShape(cubes, yaw, pitch, size) {
+  const set = new Set(cubes.map(c => c.join(","))), n = cubes.length;
+  const cen = [0,1,2].map(a => cubes.reduce((s, c) => s + c[a], 0) / n);
+  const cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  const T = ([x, y, z]) => { const x1 = x*cy + z*sy, z1 = -x*sy + z*cy; return [x1, y*cp - z1*sp, y*sp + z1*cp]; };
+  const L = [-.35, .8, .5], ln = Math.hypot(...L), faces = [];
+  const dirs = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  for (const c of cubes) for (const d of dirs) {
+    if (set.has([c[0]+d[0], c[1]+d[1], c[2]+d[2]].join(","))) continue;
+    const nt = T(d); if (nt[2] <= 1e-6) continue;
+    const ax = d.findIndex(v => v), [ua, va] = [0,1,2].filter(a => a !== ax);
+    const fc = c.map((v, a) => v - cen[a] + d[a] * .5);
+    const corner = (su, sv) => { const p = fc.slice(); p[ua] += su * .5; p[va] += sv * .5; return T(p); };
+    const pts = [corner(1,1), corner(1,-1), corner(-1,-1), corner(-1,1)];
+    const b = Math.max(0, (nt[0]*L[0] + nt[1]*L[1] + nt[2]*L[2]) / ln);
+    faces.push({ pts, z: T(fc)[2], light: 38 + 40 * b });
+  }
+  faces.sort((a, b) => a.z - b.z);
+  const all = faces.flatMap(f => f.pts), ext = Math.max(...all.map(p => Math.max(Math.abs(p[0]), Math.abs(p[1])))) || 1;
+  const s = size * .44 / ext, h = size / 2;
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true">` + faces.map(f =>
+    `<polygon points="${f.pts.map(p => `${(h + p[0]*s).toFixed(1)},${(h - p[1]*s).toFixed(1)}`).join(" ")}" style="fill:hsl(var(--cube) 30% ${f.light.toFixed(0)}%);stroke:hsl(var(--cube) 35% 16%);stroke-width:1.2;stroke-linejoin:round"/>`
+  ).join("") + `</svg>`;
+}
+
+/* ---------- Building one test run ---------- */
+function buildRun() {
+  const pref = [];
+  for (const [dom, cfg] of Object.entries(BANK)) {
+    for (const it of shuffle(cfg.items.slice()).slice(0, cfg.n)) {
+      if (dom === "job") pref.push({ kind: "choice", dom, d: it[0], q: cfg.q, opts: it.slice(1) });
+      else pref.push({ kind: "choice", dom, d: it[0], q: it[1], opts: it.slice(2) });
+    }
+  }
+  shuffle(pref);
+  pref.splice(3, 0, { kind: "fav", dom: "col" });
+  pref.splice(9, 0, { kind: "pair", dom: "col" });
+  const rot = [{ kind: "rotIntro" }];
+  for (let k = 0; k < ROT.n; k++) rot.push({ kind: "rot", dom: "rot" });
+  return [...pref.slice(0, 7), ...rot, ...pref.slice(7)];
+}
+
+/* ---------- State & screens ---------- */
+const app = document.getElementById("app");
+let run = [], step = 0, answers = [], timerRAF = 0, lockUntil = 0, keyMap = {};
+const timed = () => run.filter(s => s.kind !== "rotIntro");
+
+function startTest() { run = buildRun(); step = 0; answers = []; show(); }
+
+function record(entry) {
+  if (performance.now() < lockUntil) return;
+  cancelAnimationFrame(timerRAF); keyMap = {};
+  answers.push(entry); step++; show();
+}
+
+function startTimer(secs, onEnd) {
+  const t0 = performance.now(), bar = app.querySelector(".timer i"), box = app.querySelector(".timer");
+  const tick = now => {
+    const left = Math.max(0, 1 - (now - t0) / (secs * 1000));
+    bar.style.transform = `scaleX(${left})`;
+    box.classList.toggle("low", left < .3);
+    if (left <= 0) { onEnd(); return; }
+    timerRAF = requestAnimationFrame(tick);
+  };
+  timerRAF = requestAnimationFrame(tick);
+}
+
+function header() {
+  const list = timed(), idx = list.indexOf(run[step]) + 1;
+  return `<div class="top"><span class="eyebrow">Spectrum Test</span><span class="count">${idx} / ${list.length}</span></div><div class="timer"><i></i></div>`;
+}
+
+function show() {
+  if (step >= run.length) return showResult();
+  const s = run[step];
+  lockUntil = performance.now() + 300;
+  if (s.kind === "rotIntro") return showRotIntro();
+  if (s.kind === "choice") return showChoice(s);
+  if (s.kind === "fav") return showFav(s);
+  if (s.kind === "pair") return showPair(s);
+  if (s.kind === "rot") return showRot(s);
+}
+
+function bindKeys(handlers) { keyMap = handlers; }
+document.addEventListener("keydown", e => { const f = keyMap[e.key]; if (f) { e.preventDefault(); f(); } });
+
+function showChoice(s) {
+  const n = s.opts.length;
+  let order = s.opts.map((o, k) => ({ o, bin: k }));
+  if (n === 2) shuffle(order); else if (Math.random() < .5) order.reverse();
+  app.innerHTML = header() + `<h2>${esc(s.q)}</h2><div class="opts ${n === 2 ? "two" : "three"}">` +
+    order.map((x, k) => `<button class="opt" data-k="${k}"><span class="pic">${x.o[0]}</span><span>${esc(x.o[1])}</span><span class="key">${k + 1}</span></button>`).join("") + `</div>`;
+  const pick = k => record({ dom: s.dom, llr: llrBin(s.d, n, order[k].bin) });
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => pick(+b.dataset.k));
+  bindKeys(Object.fromEntries(order.map((_, k) => [String(k + 1), () => pick(k)])));
+  startTimer(SECS, () => record({ dom: s.dom, llr: null }));
+}
+
+function showFav(s) {
+  const opts = shuffle(FAV.map(f => ({ name: f[0], llr: f[2], css: `oklch(${rnd(.58, .7).toFixed(2)} ${rnd(.15, .19).toFixed(2)} ${(f[1] + rnd(-8, 8)).toFixed(0)})` })));
+  app.innerHTML = header() + `<h2>Tap the colour you like most.</h2><div class="sws">` +
+    opts.map((o, k) => `<button class="sw" data-k="${k}" style="background:${o.css}" aria-label="${o.name}"></button>`).join("") + `</div>`;
+  const pick = k => record({ dom: s.dom, llr: opts[k].llr });
+  app.querySelectorAll(".sw").forEach(b => b.onclick = () => pick(+b.dataset.k));
+  bindKeys(Object.fromEntries(opts.map((_, k) => [String(k + 1), () => pick(k)])));
+  startTimer(SECS, () => record({ dom: s.dom, llr: null }));
+}
+
+function showPair(s) {
+  // Paired comparison: a reddish-purple against a blue-green, randomised each time.
+  const L = rnd(.6, .72).toFixed(2), C = rnd(.12, .17).toFixed(2);
+  const opts = shuffle([{ h: rnd(320, 355), bin: 1 }, { h: rnd(170, 215), bin: 0 }]);
+  app.innerHTML = header() + `<h2>Which colour do you prefer?</h2><div class="sws pair">` +
+    opts.map((o, k) => `<button class="sw" data-k="${k}" style="background:oklch(${L} ${C} ${o.h.toFixed(0)})" aria-label="Colour ${k + 1}"></button>`).join("") + `</div>`;
+  const pick = k => record({ dom: s.dom, llr: llrBin(.28, 2, opts[k].bin) });
+  app.querySelectorAll(".sw").forEach(b => b.onclick = () => pick(+b.dataset.k));
+  bindKeys({ "1": () => pick(0), "2": () => pick(1) });
+  startTimer(SECS, () => record({ dom: s.dom, llr: null }));
+}
+
+function showRotIntro() {
+  const demo = makeShape(), y = rnd(0, 6.28);
+  app.innerHTML = `<div class="top"><span class="eyebrow">Spectrum Test</span><span class="count">Shapes</span></div>
+    <h2>Next: 4 shape puzzles</h2>
+    <p class="muted">You'll see a block shape at the top. One of the two shapes below is the same shape, just turned. The other is its mirror image. Tap the one that's the same. You have ${ROT.secs} seconds for each.</p>
+    <div class="target">${drawShape(demo, y, .45, 180)}</div>
+    <button class="btn" id="go">Start the shapes</button>`;
+  document.getElementById("go").onclick = () => { step++; show(); };
+}
+
+function showRot(s) {
+  const cubes = makeShape(), mirror = cubes.map(([x, y, z]) => [-x, y, z]);
+  const y0 = rnd(0, 6.28), size = 200;
+  const opts = shuffle([{ c: cubes, same: true }, { c: mirror, same: false }]);
+  const yaws = opts.map(() => y0 + rnd(1.2, 5.1));
+  app.innerHTML = header() + `<h2>Which one is the same shape?</h2>
+    <div class="target">${drawShape(cubes, y0, .45, size)}</div>
+    <div class="shapes">${opts.map((o, k) => `<button class="shape" data-k="${k}" aria-label="Shape ${k + 1}">${drawShape(o.c, yaws[k], .45, size)}</button>`).join("")}</div>`;
+  const res = ok => record({ dom: "rot", llr: Math.log(ok ? ROT.pm / ROT.pf : (1 - ROT.pm) / (1 - ROT.pf)), rot: true });
+  const pick = k => res(opts[k].same);
+  app.querySelectorAll(".shape").forEach(b => b.onclick = () => pick(+b.dataset.k));
+  bindKeys({ "1": () => pick(0), "2": () => pick(1) });
+  startTimer(ROT.secs, () => res(false));   // timed test: running out of time counts as a miss
+}
+
+/* ---------- Scoring ---------- */
+const NAMES = [[.15, "RED"], [.30, "ROSE"], [.43, "MAGENTA"], [.57, "PURPLE"], [.70, "VIOLET"], [.85, "INDIGO"], [1.01, "BLUE"]];
+const colourFor = p => `oklch(.58 .19 ${(385 - p * 125) % 360})`;
+const fallbackFor = p => `hsl(${(355 - p * 130 + 360) % 360} 65% 48%)`;
+
+function score() {
+  const by = {};
+  for (const a of answers) {
+    if (a.llr === null) continue;
+    (by[a.dom] ||= []).push(a.llr);
+  }
+  let total = 0; const parts = [];
+  for (const dom of Object.keys(DOMAIN_LABEL)) {
+    const xs = by[dom] || []; if (!xs.length) continue;
+    const sum = xs.reduce((s, v) => s + v, 0) / (1 + (xs.length - 1) * DOMAIN_R[dom]);   // correlated answers count less
+    total += sum; parts.push({ dom, v: sum });
+  }
+  const p = 1 / (1 + Math.exp(-TEMP * total));
+  const answered = answers.filter(a => a.llr !== null && !a.rot).length, prefTotal = answers.filter(a => !a.rot).length;
+  return { p, parts, answered, prefTotal };
+}
+
+const SOURCES = [
+  ["Su, Rounds & Armstrong (2009). Men and things, women and people: a meta-analysis of sex differences in interests. Psychological Bulletin.", "https://pubmed.ncbi.nlm.nih.gov/19883140/"],
+  ["Lippa (2010). Sex differences in personality traits and gender-related occupational preferences across 53 nations (BBC Internet Survey). Archives of Sexual Behavior.", "https://link.springer.com/doi/10.1007/s10508-008-9380-7"],
+  ["Walter et al. (2020). Sex differences in mate preferences across 45 countries: a large-scale replication. Psychological Science.", "https://doi.org/10.1177/0956797620904154"],
+  ["Weisberg, DeYoung & Hirsh (2011). Gender differences in personality across the ten aspects of the Big Five. Frontiers in Psychology.", "https://pmc.ncbi.nlm.nih.gov/articles/PMC3149680/"],
+  ["Greenberg et al. (2018). Testing the Empathizing–Systemizing theory of sex differences in 600,000+ people. PNAS.", "https://pmc.ncbi.nlm.nih.gov/articles/PMC6275492/"],
+  ["Del Giudice, Booth & Irwing (2012). The distance between Mars and Venus: measuring global sex differences in personality. PLoS ONE.", "https://doi.org/10.1371/journal.pone.0029265"],
+  ["Maeda & Yoon (2013). A meta-analysis on gender differences in mental rotation ability (larger gap under time limits). Educational Psychology Review.", "https://link.springer.com/article/10.1007/s10648-012-9215-x"],
+  ["Jonauskaite et al. (2019). Pink for girls, red for boys, and blue for both genders: colour preferences in children and adults. Sex Roles.", "https://doi.org/10.1007/s11199-018-0955-z"],
+  ["Hurlbert & Ling (2007). Biological components of sex differences in color preference. Current Biology.", "https://www.sciencedaily.com/releases/2007/08/070820120720.htm"],
+];
+
+function showResult() {
+  const { p, parts, answered, prefTotal } = score();
+  const enough = answered >= Math.ceil(prefTotal * .6);
+  const name = enough ? NAMES.find(n => p < n[0])[1] : "GREY";
+  const bg = enough ? `background:${fallbackFor(p)};background:${colourFor(p)}` : "background:#6b7280";
+  const maxAbs = Math.max(1, ...parts.map(x => Math.abs(x.v)));
+  app.innerHTML = `
+    <div class="result" style="${bg}">
+      <span class="say">Your colour is</span>
+      <span class="name">${name}</span>
+      <span class="say">${enough ? "Tell this colour to the person who gave you the test." : "Too many questions ran out of time. Take the test again."}</span>
+    </div>
+    <details>
+      <summary>For the person giving the test</summary>
+      <div class="giver">
+        <div class="spectrum"></div>
+        <div class="marker"><b style="left:${(p * 100).toFixed(1)}%"></b></div>
+        <div class="ends"><span>RED · girl</span><span>PURPLE · unsure</span><span>boy · BLUE</span></div>
+        <p>Estimated chance this person is male: <strong>${Math.round(p * 100)}%</strong>. Answered ${answered} of ${prefTotal} questions in time.</p>
+        <div class="rows">${parts.map(x => {
+          const w = Math.abs(x.v) / maxAbs * 50, left = x.v >= 0 ? 50 : 50 - w;
+          return `<div class="row"><span>${DOMAIN_LABEL[x.dom]}</span><span class="bar2"><i style="left:${left}%;width:${w}%;background:${x.v >= 0 ? colourFor(.95) : colourFor(.05)}"></i></span><span>${x.v >= 0 ? "+" : ""}${x.v.toFixed(2)}</span></div>`;
+        }).join("")}</div>
+        <p class="muted">Bars pointing right lean male, left lean female (log-likelihood units).</p>
+      </div>
+    </details>
+    <details>
+      <summary>How it works and how accurate it is</summary>
+      <div class="giver">
+        <p>Each answer is compared with how often men and women give it in large studies. Answers that measure the same thing (for example several job questions) are weighted down so they aren't counted twice. The evidence is combined into one probability, and that probability picks the colour.</p>
+        <p>Every run draws different questions, shuffles the answer order and generates new shapes, so it can't be memorised. The timer stops people from working out the "right" answer.</p>
+        <p><strong>Accuracy:</strong> in a simulation using the effect sizes from these studies, the colour matched the person's sex about 78% of the time, and the percentages were well calibrated. Real-world accuracy is probably a bit lower. Men and women overlap on every single question, so purple results are normal. The partner questions assume the person is attracted to the opposite sex.</p>
+        <ol class="src">${SOURCES.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ol>
+      </div>
+    </details>
+    <button class="btn" id="again">Take the test again</button>`;
+  document.getElementById("again").onclick = startTest;
+}
+
+function showIntro() {
+  keyMap = {};
+  app.innerHTML = `
+    <span class="eyebrow">About 2 minutes · 16 questions</span>
+    <h1>Spectrum Test</h1>
+    <p>Answer with your first instinct. At the end you get a colour somewhere on this scale.</p>
+    <div class="spectrum"></div>
+    <ul class="rules muted">
+      <li>Each question has a ${SECS}-second timer. If it runs out, the question is skipped.</li>
+      <li>There are 4 quick shape puzzles in the middle.</li>
+      <li class="kbd-tip">You can click, or use the number keys 1, 2, 3.</li>
+    </ul>
+    <button class="btn" id="start">Start the test</button>`;
+  document.getElementById("start").onclick = startTest;
+}
+showIntro();
+</script>
+
+</body>
+</html>
